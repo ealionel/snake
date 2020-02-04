@@ -1,12 +1,12 @@
 export interface GameRules {
   tickRate: number // in ms
   defaultLength: number
+  rows: number
+  columns: number
 }
 
 export interface WorldProperties {
-  spaceInterval: number
-  rows: number
-  columns: number
+  cellSpace: number
 }
 
 export interface Cell {
@@ -20,3 +20,5 @@ export enum Direction {
   LEFT,
   RIGHT,
 }
+
+export type Observer = (data: any) => any

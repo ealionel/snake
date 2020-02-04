@@ -1,4 +1,4 @@
-import { GameRules, Cell, Direction } from './../interfaces'
+import { GameRules, Cell, Direction, Observer } from './../interfaces'
 import World from './World'
 import Snake from './Snake'
 import { randomCell, collisionCheck } from '../helpers'
@@ -6,38 +6,27 @@ import * as _ from 'lodash'
 
 export default class Game {
   timer: number = 0 // Number of ticks
-  world: World
   rules: GameRules
   player: Snake
 
   foods: Cell[]
 
-  constructor(world: World, rules: GameRules) {
-    this.world = world
-    this.rules = rules
+  observers: Observer[] = []
 
-    this.world.canvas.addEventListener('keydown', e => {
-      switch (e.key) {
-        case 'ArrowLeft':
-          this.player.direction = Direction.LEFT
-          break
-        case 'ArrowRight':
-          this.player.direction = Direction.RIGHT
-          break
-        case 'ArrowUp':
-          this.player.direction = Direction.UP
-          break
-        case 'ArrowDown':
-          this.player.direction = Direction.DOWN
-          break
-      }
-    })
+  // Direction snake should head to on next frame
+  moveBuffer: Direction
+
+  constructor(rules: GameRules) {
+    this.rules = rules
+    this.player = new Snake({ x: 0, y: 0 })
+
+    this.player.direction = Direction.RIGHT
+    this.moveBuffer = Direction.RIGHT
   }
 
-  start(initialCell: Cell) {
+  start() {
     console.log('Game Started...')
-    this.player = new Snake(initialCell)
-    const createRandomCell = () => randomCell(this.world.getLastCell())
+    const createRandomCell = () => randomCell(this.getLastCell())
     this.foods = [createRandomCell()]
 
     const endCallback = () => {
@@ -45,6 +34,9 @@ export default class Game {
     }
 
     const intervalId = setInterval(() => {
+      this.notifyObservers()
+
+      this.player.direction = this.moveBuffer
       this.player.addHead(this.player.nextCell())
       const head: Cell = this.player.getHead()
 
@@ -53,7 +45,6 @@ export default class Game {
         collisionCheck(this.player.tail.slice(1), head)
       ) {
         clearInterval(intervalId)
-        console.log(this.borderCheck(head), this.player.tail)
         endCallback()
       }
 
@@ -63,10 +54,6 @@ export default class Game {
       } else {
         this.player.removeLast()
       }
-
-      this.world.clear()
-      this.renderFood()
-      this.renderSnake()
 
       this.timer += 1
     }, this.rules.tickRate)
@@ -80,13 +67,20 @@ export default class Game {
     return (
       cell.x < 0 ||
       cell.y < 0 ||
-      cell.x > this.world.properties.rows ||
-      cell.y > this.world.properties.columns
+      cell.x > this.rules.rows - 1 ||
+      cell.y > this.rules.columns - 1
     )
   }
 
+  getLastCell(): Cell {
+    return {
+      x: this.rules.columns - 1,
+      y: this.rules.rows - 1,
+    }
+  }
+
   generateFood() {
-    const randCell = () => randomCell(this.world.getLastCell())
+    const randCell = () => randomCell(this.getLastCell())
     let cell: Cell = randCell()
     while (
       collisionCheck(this.foods, cell) ||
@@ -98,11 +92,17 @@ export default class Game {
     this.foods.push(cell)
   }
 
-  renderSnake() {
-    this.world.drawCells(this.player.tail)
+  addObserver(observer: Observer) {
+    this.observers.push(observer)
   }
 
-  renderFood() {
-    this.world.drawCells(this.foods, 'blue')
+  removeObserver(rmObs: Observer) {
+    this.observers = this.observers.filter(obs => obs !== rmObs)
+  }
+
+  notifyObservers() {
+    this.observers.forEach(observer => {
+      observer(this)
+    })
   }
 }

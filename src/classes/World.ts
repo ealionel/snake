@@ -1,24 +1,47 @@
+import { makeController, GameHandler } from './Controller'
 import { Cell } from './../interfaces'
 import { GameRules, WorldProperties } from '../interfaces'
+import Game from './Game'
 
 export default class World {
   canvas: HTMLCanvasElement
   properties: WorldProperties
-  controller: (event: Event) => void
+  game: Game
+  controllers: GameHandler<World>[]
 
-  constructor(properties: WorldProperties) {
+  constructor(
+    game: Game,
+    controllers: GameHandler<World>[],
+    properties: WorldProperties,
+  ) {
     this.canvas = document.createElement('canvas')
+    this.game = game
+    this.controllers = controllers
 
-    this.canvas.width = properties.spaceInterval * properties.columns + 1
-    this.canvas.height = properties.spaceInterval * properties.rows + 1
+    this.canvas.width = properties.cellSpace * game.rules.columns + 1
+    this.canvas.height = properties.cellSpace * game.rules.rows + 1
 
     this.canvas.classList.add('gameCanvas')
+
+    const makeSnakeController = makeController<World>(this.game, this)
+
+    game.addObserver(this.onUpdate)
+
+    this.controllers.forEach(controller => {
+      makeSnakeController(controller)
+    })
 
     this.properties = properties
 
     this.canvas.tabIndex = 0
 
     this.drawGrid()
+  }
+
+  onUpdate = () => {
+    this.clear()
+    this.drawCells(this.game.player.tail)
+    this.drawFoods(this.game.foods, '#ff8352')
   }
 
   drawGrid(color: string = 'lightgray') {
@@ -30,45 +53,48 @@ export default class World {
     context.strokeStyle = 'lightgray'
 
     context.beginPath()
-    for (let x = 0; x <= this.properties.columns; x++) {
-      let pos = x * this.properties.spaceInterval + 0.5
+    for (let x = 0; x <= this.game.rules.columns; x++) {
+      let pos = x * this.properties.cellSpace + 0.5
       context.moveTo(pos, 0)
       context.lineTo(pos, height)
     }
-    for (let y = 0; y <= this.properties.rows; y++) {
-      let pos = y * this.properties.spaceInterval + 0.5
+    for (let y = 0; y <= this.game.rules.rows; y++) {
+      let pos = y * this.properties.cellSpace + 0.5
       context.moveTo(0, pos)
       context.lineTo(width, pos)
     }
     context.stroke()
   }
 
-  drawCell = ({ x, y }: Cell, color: string = 'black'): boolean => {
-    if (x > this.properties.columns || y > this.properties.rows) {
+  drawCell = (cell: Cell, color: string = 'black'): boolean => {
+    if (
+      cell.x > this.game.rules.columns - 1 ||
+      cell.y > this.game.rules.rows - 1
+    ) {
       // console.warn(`Tried to draw non existing cell: (${x}, ${y})`)
       return false
     }
 
-    if (x == null || y == null) {
+    if (cell.x == null || cell.y == null) {
       return
     }
 
     const context = this.canvas.getContext('2d')
-    const space = this.properties.spaceInterval
+    const space = this.properties.cellSpace
     context.fillStyle = color
-    context.fillRect(x * space, y * space, space, space)
+    context.fillRect(cell.x * space, cell.y * space, space, space)
 
     return true
   }
 
   drawFood = (cell: Cell, color: string = 'black'): boolean => {
     const context = this.canvas.getContext('2d')
-    const space = this.properties.spaceInterval
+    const space = this.properties.cellSpace
 
     const [px, py] = this.cellToPixel(cell)
     context.fillStyle = color
     context.beginPath()
-    context.arc(px + space / 2, py + space / 2, space * 0.8, 0, 2 * Math.PI)
+    context.arc(px + space / 2, py + space / 2, space * 0.375, 0, 2 * Math.PI)
     context.fill()
     context.closePath()
 
@@ -100,15 +126,8 @@ export default class World {
    */
   cellToPixel(cell: Cell): number[] {
     return [
-      cell.x * this.properties.spaceInterval,
-      cell.y * this.properties.spaceInterval,
+      cell.x * this.properties.cellSpace,
+      cell.y * this.properties.cellSpace,
     ]
-  }
-
-  getLastCell(): Cell {
-    return {
-      x: this.properties.columns - 1,
-      y: this.properties.rows - 1,
-    }
   }
 }
