@@ -8,16 +8,17 @@ import { randomCell } from './helpers'
 const rules: GameRules = {
   tickRate: 100,
   defaultLength: 1,
-  columns: 40,
-  rows: 40,
+  columns: 15,
+  rows: 15,
 }
 
 const worldOptions: WorldProperties = {
-  cellSpace: 15,
+  cellSpace: 30,
 }
 
 const game = new Game(rules)
 const world = new World(game, worldOptions)
+const world2 = new World(game, { cellSpace: 20 })
 const controller = createKeyboardController(game, world)
 
 const snake1 = new Snake({ x: 0, y: 0 })
@@ -34,7 +35,7 @@ controller(snake2, {
 game.addSnake(snake1)
 game.addSnake(snake2)
 
-game.start()
+game.run()
 
 document.body.appendChild(world.canvas)
 world.canvas.focus()

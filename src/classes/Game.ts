@@ -1,57 +1,81 @@
 import { cellCollisionCheck, randomCell, snakeCollisionCheck } from '../helpers'
-import { Cell, Direction, GameRules, Observer } from './../interfaces'
+import { Cell, GameRules, Observer, GameState } from './../interfaces'
 import Snake from './Snake'
 
 export default class Game {
   timer: number = 0 // Number of ticks
   rules: GameRules
   snakes: Snake[] = []
-
   foods: Cell[] = []
-
   observers: Observer[] = []
+
+  state: GameState = GameState.PAUSED
+  intervalId: any
 
   constructor(rules: GameRules) {
     this.rules = rules
+    this.generateFood()
   }
 
-  start() {
-    console.log('Game Started...')
-    this.generateFood()
-
-    const endCallback = () => {
-      console.log('Game over !')
+  run() {
+    if (this.state === GameState.RUNNING) {
+      return
     }
 
-    const intervalId = setInterval(() => {
-      this.notifyObservers() // To render views
+    this.state = GameState.RUNNING
+    console.log('Game running.')
+    this.intervalId = setInterval(this.loop, this.rules.tickRate)
+  }
 
-      this.snakes.forEach(snake => {
-        snake.direction = snake.moveBuffer
+  loop = () => {
+    this.notifyObservers() // To render views
 
-        const newCell = snake.nextCell()
+    this.snakes.forEach(snake => {
+      snake.direction = snake.moveBuffer
 
-        // Eat food
-        if (cellCollisionCheck(this.foods, newCell)) {
-          snake.grow()
-          this.foods.pop()
-          this.generateFood()
-        } else {
-          snake.move()
-        }
+      const newCell = snake.nextCell()
 
-        // End game
-        if (
-          this.isOutsideBorder(newCell) ||
-          this.snakes.some(s => snakeCollisionCheck(snake, s))
-        ) {
-          this.removeSnake(snake)
-          endCallback()
-        }
-      })
+      // Eat food
+      if (cellCollisionCheck(this.foods, newCell)) {
+        snake.grow()
+        this.foods.pop()
+        this.generateFood()
+      } else {
+        snake.move()
+      }
 
-      this.timer += 1
-    }, this.rules.tickRate)
+      // End game
+      if (
+        this.isOutsideBorder(newCell) ||
+        this.snakes.some(s => snakeCollisionCheck(snake, s))
+      ) {
+        this.removeSnake(snake)
+        console.log('Game over !')
+      }
+    })
+
+    this.timer += 1
+  }
+
+  pause() {
+    if (this.state === GameState.RUNNING) {
+      clearInterval(this.intervalId)
+      this.state = GameState.PAUSED
+      console.log('Game paused.')
+    }
+  }
+
+  togglePause() {
+    switch (this.state) {
+      case GameState.PAUSED:
+        this.run()
+        break
+      case GameState.RUNNING:
+        this.pause()
+        break
+    }
+
+    return this.state
   }
 
   /**

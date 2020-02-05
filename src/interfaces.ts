@@ -22,6 +22,11 @@ export enum Direction {
   RIGHT,
 }
 
+export enum GameState {
+  RUNNING,
+  PAUSED,
+}
+
 export type Observer = (data: any) => any
 
 export interface KeyboardMapControl {
@@ -29,4 +34,5 @@ export interface KeyboardMapControl {
   down: string
   left: string
   right: string
+  pause?: string
 }

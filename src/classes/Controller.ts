@@ -12,6 +12,7 @@ export function createKeyboardController(game: Game, world: World) {
       down: 'ArrowDown',
       left: 'ArrowLeft',
       right: 'ArrowRight',
+      pause: 'p',
     },
   ) => {
     world.canvas.addEventListener('keydown', e => {
@@ -30,6 +31,9 @@ export function createKeyboardController(game: Game, world: World) {
           break
         case keysControl.down:
           snake.controlDown()
+          break
+        case keysControl.pause:
+          game.togglePause()
           break
       }
     })
