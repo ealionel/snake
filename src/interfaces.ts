@@ -3,6 +3,7 @@ export interface GameRules {
   defaultLength: number
   rows: number
   columns: number
+  snakesCollision?: boolean
 }
 
 export interface WorldProperties {
@@ -22,3 +23,10 @@ export enum Direction {
 }
 
 export type Observer = (data: any) => any
+
+export interface KeyboardMapControl {
+  up: string
+  down: string
+  left: string
+  right: string
+}

@@ -1,4 +1,3 @@
-import { makeController, GameHandler } from './Controller'
 import { Cell } from './../interfaces'
 import { GameRules, WorldProperties } from '../interfaces'
 import Game from './Game'
@@ -7,29 +6,17 @@ export default class World {
   canvas: HTMLCanvasElement
   properties: WorldProperties
   game: Game
-  controllers: GameHandler<World>[]
 
-  constructor(
-    game: Game,
-    controllers: GameHandler<World>[],
-    properties: WorldProperties,
-  ) {
+  constructor(game: Game, properties: WorldProperties) {
     this.canvas = document.createElement('canvas')
     this.game = game
-    this.controllers = controllers
 
     this.canvas.width = properties.cellSpace * game.rules.columns + 1
     this.canvas.height = properties.cellSpace * game.rules.rows + 1
 
     this.canvas.classList.add('gameCanvas')
 
-    const makeSnakeController = makeController<World>(this.game, this)
-
     game.addObserver(this.onUpdate)
-
-    this.controllers.forEach(controller => {
-      makeSnakeController(controller)
-    })
 
     this.properties = properties
 
@@ -40,7 +27,9 @@ export default class World {
 
   onUpdate = () => {
     this.clear()
-    this.drawCells(this.game.player.tail)
+    this.game.snakes.forEach(snake => {
+      this.drawCells(snake.tail)
+    })
     this.drawFoods(this.game.foods, '#ff8352')
   }
 

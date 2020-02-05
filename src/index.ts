@@ -1,24 +1,52 @@
 import { GameRules, WorldProperties } from './interfaces'
 import World from './classes/World'
 import Game from './classes/Game'
-import { arrowController, zqsdController } from './classes/Controller'
+import { createKeyboardController } from './classes/Controller'
+import Snake from './classes/Snake'
+import { randomCell } from './helpers'
 
 const rules: GameRules = {
-  tickRate: 70,
+  tickRate: 150,
   defaultLength: 1,
-  columns: 15,
-  rows: 15,
+  columns: 40,
+  rows: 40,
 }
 
 const worldOptions: WorldProperties = {
-  cellSpace: 30,
+  cellSpace: 15,
 }
 
 const game = new Game(rules)
-const world = new World(game, [arrowController, zqsdController], worldOptions)
+const world = new World(game, worldOptions)
+const controller = createKeyboardController(game, world)
+
+const snake1 = new Snake({ x: 0, y: 0 })
+const snake2 = new Snake({ x: 0, y: 10 })
+
+controller(snake1)
+controller(snake2)
+controller(snake1, {
+  up: 'z',
+  down: 's',
+  left: 'q',
+  right: 'd',
+})
+
+game.addSnake(snake1)
+game.addSnake(snake2)
 
 game.start()
 
 document.body.appendChild(world.canvas)
-// document.body.appendChild(world2.canvas)
+world.canvas.focus()
+
+const addSnakeButton = document.createElement('button')
+addSnakeButton.innerHTML = 'Add Shhnekkk'
+addSnakeButton.addEventListener('click', e => {
+  const newSnake = new Snake(randomCell(game.getLastCell()))
+  game.addSnake(newSnake)
+})
+
+document.body.appendChild(addSnakeButton)
+
 document.body.style.textAlign = 'center'

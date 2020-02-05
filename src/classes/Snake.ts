@@ -1,12 +1,14 @@
 import { Direction, Cell } from './../interfaces'
 export default class Snake {
   direction: Direction
+  moveBuffer: Direction
   length: number
   tail: Cell[]
 
   constructor(cell?: Cell, length: number = 1) {
     this.direction = Direction.RIGHT
-    this.length = 1
+    this.moveBuffer = Direction.RIGHT
+    this.length = length
 
     this.tail = [cell] || [{ x: 0, y: 0 }]
   }
@@ -41,5 +43,27 @@ export default class Snake {
     }
 
     return cell
+  }
+
+  move() {
+    this.addHead(this.nextCell())
+    this.removeLast()
+  }
+
+  grow() {
+    this.addHead(this.nextCell())
+  }
+
+  controlUp() {
+    if (this.direction !== Direction.DOWN) this.moveBuffer = Direction.UP
+  }
+  controlDown() {
+    if (this.direction !== Direction.UP) this.moveBuffer = Direction.DOWN
+  }
+  controlLeft() {
+    if (this.direction !== Direction.RIGHT) this.moveBuffer = Direction.LEFT
+  }
+  controlRight() {
+    if (this.direction !== Direction.LEFT) this.moveBuffer = Direction.RIGHT
   }
 }
