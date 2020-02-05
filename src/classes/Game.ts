@@ -1,4 +1,4 @@
-import { collisionCheck, randomCell } from '../helpers'
+import { cellCollisionCheck, randomCell, snakeCollisionCheck } from '../helpers'
 import { Cell, Direction, GameRules, Observer } from './../interfaces'
 import Snake from './Snake'
 
@@ -32,7 +32,7 @@ export default class Game {
         const newCell = snake.nextCell()
 
         // Eat food
-        if (collisionCheck(this.foods, newCell)) {
+        if (cellCollisionCheck(this.foods, newCell)) {
           snake.grow()
           this.foods.pop()
           this.generateFood()
@@ -40,9 +40,10 @@ export default class Game {
           snake.move()
         }
 
+        // End game
         if (
           this.isOutsideBorder(newCell) ||
-          collisionCheck(snake.tail.slice(1), newCell)
+          this.snakes.some(s => snakeCollisionCheck(snake, s))
         ) {
           this.removeSnake(snake)
           endCallback()
@@ -77,7 +78,7 @@ export default class Game {
     const randCell = () => randomCell(this.getLastCell())
     let cell: Cell = randCell()
     while (
-      collisionCheck(this.foods, cell)
+      cellCollisionCheck(this.foods, cell)
       // || collisionCheck(this.snake.tail, cell)
     ) {
       cell = randCell()

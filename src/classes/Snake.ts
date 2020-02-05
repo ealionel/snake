@@ -5,7 +5,13 @@ export default class Snake {
   length: number
   tail: Cell[]
 
+  id: number
+
+  static nbInstances = 0
+
   constructor(cell?: Cell, length: number = 1) {
+    Snake.nbInstances += 1
+    this.id = Snake.nbInstances
     this.direction = Direction.RIGHT
     this.moveBuffer = Direction.RIGHT
     this.length = length
@@ -65,5 +71,9 @@ export default class Snake {
   }
   controlRight() {
     if (this.direction !== Direction.LEFT) this.moveBuffer = Direction.RIGHT
+  }
+
+  toString() {
+    return `Snake #${this.id}`
   }
 }

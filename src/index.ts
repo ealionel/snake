@@ -6,7 +6,7 @@ import Snake from './classes/Snake'
 import { randomCell } from './helpers'
 
 const rules: GameRules = {
-  tickRate: 150,
+  tickRate: 100,
   defaultLength: 1,
   columns: 40,
   rows: 40,
@@ -24,8 +24,7 @@ const snake1 = new Snake({ x: 0, y: 0 })
 const snake2 = new Snake({ x: 0, y: 10 })
 
 controller(snake1)
-controller(snake2)
-controller(snake1, {
+controller(snake2, {
   up: 'z',
   down: 's',
   left: 'q',
@@ -44,6 +43,7 @@ const addSnakeButton = document.createElement('button')
 addSnakeButton.innerHTML = 'Add Shhnekkk'
 addSnakeButton.addEventListener('click', e => {
   const newSnake = new Snake(randomCell(game.getLastCell()))
+  controller(newSnake)
   game.addSnake(newSnake)
 })
 
