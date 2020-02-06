@@ -60,6 +60,23 @@ export default class Snake {
     this.addHead(this.nextCell())
   }
 
+  control(direction: Direction) {
+    switch (direction) {
+      case Direction.UP:
+        this.controlUp()
+        break
+      case Direction.DOWN:
+        this.controlDown()
+        break
+      case Direction.LEFT:
+        this.controlLeft()
+        break
+      case Direction.RIGHT:
+        this.controlRight()
+        break
+    }
+  }
+
   controlUp() {
     if (this.direction !== Direction.DOWN) this.moveBuffer = Direction.UP
   }

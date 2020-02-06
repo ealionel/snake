@@ -1,7 +1,10 @@
-import { GameRules, WorldProperties } from './interfaces'
+import { GameRules, WorldProperties, Direction } from './interfaces'
 import World from './classes/World'
 import Game from './classes/Game'
-import { createKeyboardController } from './classes/Controller'
+import {
+  createKeyboardController,
+  createAutoController,
+} from './classes/Controller'
 import Snake from './classes/Snake'
 import { randomCell } from './helpers'
 
@@ -20,17 +23,34 @@ const game = new Game(rules)
 const world = new World(game, worldOptions)
 const world2 = new World(game, { cellSpace: 20 })
 const controller = createKeyboardController(game, world)
+const autoController = createAutoController(game)
 
 const snake1 = new Snake({ x: 0, y: 0 })
 const snake2 = new Snake({ x: 0, y: 10 })
 
 controller(snake1)
-controller(snake2, {
-  up: 'z',
-  down: 's',
-  left: 'q',
-  right: 'd',
-})
+// controller(snake2, {
+//   up: 'z',
+//   down: 's',
+//   left: 'q',
+//   right: 'd',
+// })
+
+autoController(
+  snake1,
+  [
+    Direction.RIGHT,
+    Direction.RIGHT,
+    Direction.DOWN,
+    Direction.DOWN,
+    Direction.LEFT,
+    Direction.LEFT,
+    Direction.UP,
+    Direction.UP,
+    Direction.RIGHT,
+  ],
+  false,
+)
 
 game.addSnake(snake1)
 game.addSnake(snake2)

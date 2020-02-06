@@ -1,4 +1,4 @@
-import { Cell } from './../interfaces'
+import { Cell, GameEvent } from './../interfaces'
 import { GameRules, WorldProperties } from '../interfaces'
 import Game from './Game'
 
@@ -16,7 +16,7 @@ export default class World {
 
     this.canvas.classList.add('gameCanvas')
 
-    game.addObserver(this.onUpdate)
+    game.subscribe(GameEvent.NEW_TICK, this.onUpdate)
 
     this.properties = properties
 

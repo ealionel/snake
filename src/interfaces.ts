@@ -16,10 +16,10 @@ export interface Cell {
 }
 
 export enum Direction {
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
+  UP = 'UP',
+  DOWN = 'DOWN',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
 }
 
 export enum GameState {
@@ -27,7 +27,7 @@ export enum GameState {
   PAUSED,
 }
 
-export type Observer = (data: any) => any
+export type EventHandler = (data: any) => void
 
 export interface KeyboardMapControl {
   up: string
@@ -35,4 +35,10 @@ export interface KeyboardMapControl {
   left: string
   right: string
   pause?: string
+}
+
+export enum GameEvent {
+  NEW_TICK = 'NEW_TICK',
+  PAUSE = 'PAUSE',
+  RUN = 'RUN',
 }

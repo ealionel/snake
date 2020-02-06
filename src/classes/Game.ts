@@ -1,5 +1,11 @@
 import { cellCollisionCheck, randomCell, snakeCollisionCheck } from '../helpers'
-import { Cell, GameRules, Observer, GameState } from './../interfaces'
+import {
+  Cell,
+  GameRules,
+  EventHandler,
+  GameState,
+  GameEvent,
+} from './../interfaces'
 import Snake from './Snake'
 
 export default class Game {
@@ -7,7 +13,11 @@ export default class Game {
   rules: GameRules
   snakes: Snake[] = []
   foods: Cell[] = []
-  observers: Observer[] = []
+
+  subscribers: Array<{
+    handler: EventHandler
+    event: GameEvent
+  }> = []
 
   state: GameState = GameState.PAUSED
   intervalId: any
@@ -21,6 +31,7 @@ export default class Game {
     if (this.state === GameState.RUNNING) {
       return
     }
+    this.emit(GameEvent.RUN)
 
     this.state = GameState.RUNNING
     console.log('Game running.')
@@ -28,7 +39,7 @@ export default class Game {
   }
 
   loop = () => {
-    this.notifyObservers() // To render views
+    this.emit(GameEvent.NEW_TICK) // To render views
 
     this.snakes.forEach(snake => {
       snake.direction = snake.moveBuffer
@@ -59,6 +70,8 @@ export default class Game {
 
   pause() {
     if (this.state === GameState.RUNNING) {
+      this.emit(GameEvent.PAUSE)
+
       clearInterval(this.intervalId)
       this.state = GameState.PAUSED
       console.log('Game paused.')
@@ -98,17 +111,24 @@ export default class Game {
     }
   }
 
-  generateFood() {
+  getRandomEmptyCell(): Cell {
     const randCell = () => randomCell(this.getLastCell())
     let cell: Cell = randCell()
     while (
-      cellCollisionCheck(this.foods, cell)
-      // || collisionCheck(this.snake.tail, cell)
+      cellCollisionCheck(this.foods, cell) ||
+      this.snakes.some(snake => cellCollisionCheck(snake.tail, cell))
     ) {
       cell = randCell()
     }
 
-    this.foods.push(cell)
+    return cell
+  }
+
+  generateFood(): Cell {
+    const randCell = this.getRandomEmptyCell()
+    this.foods.push(randCell)
+
+    return randCell
   }
 
   addSnake(snake: Snake) {
@@ -119,17 +139,22 @@ export default class Game {
     this.snakes = this.snakes.filter(snake => snake !== rmSnake)
   }
 
-  addObserver(observer: Observer) {
-    this.observers.push(observer)
+  subscribe(event: GameEvent, observer: EventHandler) {
+    this.subscribers.push({
+      event,
+      handler: observer,
+    })
   }
 
-  removeObserver(rmObs: Observer) {
-    this.observers = this.observers.filter(obs => obs !== rmObs)
+  unsubscribe(rmObs: EventHandler) {
+    this.subscribers = this.subscribers.filter(subs => subs.handler !== rmObs)
   }
 
-  notifyObservers() {
-    this.observers.forEach(observer => {
-      observer(this)
+  emit(event: GameEvent, data?: any) {
+    this.subscribers.forEach(sub => {
+      if (sub.event === event) {
+        sub.handler(data)
+      }
     })
   }
 }
