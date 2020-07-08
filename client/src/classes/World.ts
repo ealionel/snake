@@ -1,4 +1,4 @@
-import { Cell, GameEvent } from './../interfaces'
+import { Cell, GameEvent } from '../interfaces'
 import { GameRules, WorldProperties } from '../interfaces'
 import Game from './Game'
 
@@ -27,7 +27,7 @@ export default class World {
 
   onUpdate = () => {
     this.clear()
-    this.game.snakes.forEach(snake => {
+    this.game.snakes.forEach((snake) => {
       this.drawCells(snake.tail)
     })
     this.drawFoods(this.game.foods, '#ff8352')
@@ -95,7 +95,7 @@ export default class World {
    */
   makeMultiDrawer(drawer: (cell: Cell, color: string) => boolean) {
     return (cells: Cell[], color: string = 'black'): boolean[] => {
-      return cells.map(cell => drawer(cell, color))
+      return cells.map((cell) => drawer(cell, color))
     }
   }
 

@@ -7,6 +7,7 @@ import {
 } from './classes/Controller'
 import Snake from './classes/Snake'
 import { randomCell } from './helpers'
+import * as io from 'socket.io-client'
 
 const rules: GameRules = {
   tickRate: 100,
@@ -71,3 +72,7 @@ addSnakeButton.addEventListener('click', (e) => {
 document.body.appendChild(addSnakeButton)
 
 document.body.style.textAlign = 'center'
+
+const socket = io('ws://localhost:8000/')
+
+socket.emit('data', 'coucou ça va')

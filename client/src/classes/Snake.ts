@@ -1,4 +1,4 @@
-import { Direction, Cell } from './../interfaces'
+import { Direction, Cell } from '../interfaces'
 export default class Snake {
   direction: Direction
   moveBuffer: Direction
@@ -60,7 +60,7 @@ export default class Snake {
     this.addHead(this.nextCell())
   }
 
-  control(direction: Direction) {
+  control = (direction: Direction) => {
     switch (direction) {
       case Direction.UP:
         this.controlUp()
@@ -77,16 +77,16 @@ export default class Snake {
     }
   }
 
-  controlUp() {
+  controlUp = () => {
     if (this.direction !== Direction.DOWN) this.moveBuffer = Direction.UP
   }
-  controlDown() {
+  controlDown = () => {
     if (this.direction !== Direction.UP) this.moveBuffer = Direction.DOWN
   }
-  controlLeft() {
+  controlLeft = () => {
     if (this.direction !== Direction.RIGHT) this.moveBuffer = Direction.LEFT
   }
-  controlRight() {
+  controlRight = () => {
     if (this.direction !== Direction.LEFT) this.moveBuffer = Direction.RIGHT
   }
 

@@ -1,5 +1,5 @@
 import { cellCollisionCheck, randomCell, snakeCollisionCheck } from '../helpers'
-import { Cell, GameRules, EventHandler, GameEvent } from './../interfaces'
+import { Cell, GameRules, EventHandler, GameEvent } from '../interfaces'
 import Snake from './Snake'
 
 interface GameOperations {
@@ -134,6 +134,7 @@ export default class Game {
         this.isOutsideBorder(newCell) ||
         this.snakes.some((s) => snakeCollisionCheck(snake, s))
       ) {
+        this.emit(GameEvent.DEAD_SNAKE, snake)
         this.removeSnake(snake)
         console.log('Game over !')
       }

@@ -36,4 +36,8 @@ export enum GameEvent {
   NEW_TICK = 'NEW_TICK',
   PAUSE = 'PAUSE',
   RUN = 'RUN',
+  DEAD_SNAKE = 'DEAD_SNAKE',
+  GAME_OVER = 'GAME_OVER',
+  NEW_GAME = 'NEW_GAME',
+  NEW_FRAME = 'NEW_FRAME',
 }

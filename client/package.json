@@ -4,7 +4,9 @@
   "description": "Create snake as fast as possible",
   "main": "index.js",
   "dependencies": {
+    "@types/socket.io-client": "^1.4.33",
     "lodash": "^4.17.17",
+    "socket.io-client": "^2.3.0",
     "ts-loader": "^6.2.2",
     "typescript": "^3.9.6"
   },
