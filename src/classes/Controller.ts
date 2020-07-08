@@ -15,8 +15,15 @@ export function createKeyboardController(game: Game, world: World) {
       pause: 'p',
     },
   ) => {
-    world.canvas.addEventListener('keydown', e => {
+    world.canvas.addEventListener('keydown', (e) => {
       e.preventDefault()
+
+      const map = new Map()
+
+      map.set(keysControl.left, snake.controlLeft)
+      map.set(keysControl.right, snake.controlRight)
+      map.set(keysControl.up, snake.controlLeft)
+      map.set(keysControl.down, snake.controlDown)
 
       const dir = snake.direction
       switch (e.key) {

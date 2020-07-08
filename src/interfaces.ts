@@ -22,11 +22,6 @@ export enum Direction {
   RIGHT = 'RIGHT',
 }
 
-export enum GameState {
-  RUNNING,
-  PAUSED,
-}
-
 export type EventHandler = (data: any) => void
 
 export interface KeyboardMapControl {
